@@ -1,0 +1,78 @@
+---
+title: "R Practice: Mapping Countries in Europe"
+author: "Sylvia de Boer"
+output:
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+---
+
+# R Practice: Mapping Countries in Europe
+##### Sylvia de Boer
+##### GIS III
+
+
+#### Version of R and MacOS used:
+    platform       x86_64-apple-darwin15.6.0   
+    arch           x86_64                      
+    os             darwin15.6.0                
+    system         x86_64, darwin15.6.0        
+    status                                     
+    major          3                           
+    minor          6.3                         
+    year           2020                        
+    month          02                          
+    day            29                          
+    svn rev        77875                       
+    language       R                           
+    version.string R version 3.6.3 (2020-02-29)
+    nickname       Holding the Windsock  
+
+
+#### Goal
+    By following these instructions, I mapped the places in Europe I have visited.
+    
+    
+#### Required Packages
+    Given that they are already installed, you can refresh the libraries below in order to access the map we will be using.
+
+```{r, results="hide"}
+library(sf)
+library(raster)
+library(spData)
+library(spDataLarge)
+```
+
+
+#### Coding
+Here, we bring up the map of the world that we downloaded earlier through the packages we installed. Note that we're ordering by "name_long", which is why each country is a different color.
+```{r eval=TRUE}
+plot(world["name_long"], reset = TRUE)
+```
+In this next step, we'll identify the countries within the map that we'll need later.
+```{r eval=TRUE}
+germany = world[world$name_long == "Germany", ]
+italy = world[world$name_long == "Italy", ]
+netherlands = world[world$name_long == "Netherlands", ]
+czechrepublic = world[world$name_long == "Czech Republic", ]
+spain = world[world$name_long == "Spain", ]
+unitedkingdom = world[world$name_long == "United Kingdom", ]
+belgium = world[world$name_long == "Belgium", ]
+france = world[world$name_long == "France", ]
+europe = world[world$continent == "Europe", ]
+```
+
+Finally, we'll assign each country a different color.
+```{r eval=TRUE}
+plot(st_geometry(germany), col = "white", lwd = 3, main = "Places I've Visited in Europe", border = "lightgrey", expandBB = c(0.5, 0.2, 0.5, 0.2))
+plot(st_geometry(world), lty = 3, add = TRUE, border = "grey")
+plot(st_geometry(germany), col = "red", add = TRUE, border = "darkgrey")
+plot(st_geometry(italy), col = "blue", add = TRUE, border = "darkgrey")
+plot(st_geometry(netherlands), col = "orange", add = TRUE, border = "darkgrey")
+plot(st_geometry(czechrepublic), col = "yellow", add = TRUE, border = "darkgrey")
+plot(st_geometry(belgium), col = "purple", add = TRUE, border = "darkgrey")
+plot(st_geometry(spain), col = "lightblue", add = TRUE, border = "darkgrey")
+plot(st_geometry(france), col = "green", add = TRUE, border = "darkgrey")
+plot(st_geometry(unitedkingdom), col = "pink", add = TRUE, border = "darkgrey")
+```
