@@ -1,0 +1,93 @@
+---
+title: "Making a Histogram of South American Coffee Production"
+author: "Sylvia de Boer"
+output:
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+---
+
+###Objective
+Here, I will use spatial data packages and summary data to better understand and manipulate coffee production data from 2016 and 2017. Finally, I will produce a histogram that shows us the distribution of large and small scales of coffee production in South America.
+
+###Installing the Correct Libraries
+First, it's important to make sure you have the correct packages downloaded. Do so by inputting the following code.
+
+```{r}
+library(sf)
+library(raster)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(spData)
+```
+
+###Understanding our Dataset
+
+First, we're going to look at our dataset.
+
+```{r}
+coffee_data
+```
+
+Here we see names of countries and coffee production by year for 2016 and 2017, in thousands of 60 kg bags. So next, we're going to join the "world" set and the "coffee" datasets, in order to mesh the data for country statistics and coffee production and create a master set of data:
+
+```{r}
+world_coffee = left_join(world, coffee_data)
+```
+
+Next, we're going to calculate mean production per country for the year 2016:
+
+```{r}
+mean(coffee_data$coffee_production_2016, na.rm = TRUE)
+mean(coffee_data$coffee_production_2017, na.rm = TRUE)
+```
+
+And the median: 
+
+```{r}
+median(coffee_data$coffee_production_2016, na.rm = TRUE)
+median(coffee_data$coffee_production_2017, na.rm = TRUE)
+```
+
+And minimums and maximums:
+
+```{r}
+min(coffee_data$coffee_production_2016, na.rm = TRUE)
+min (coffee_data$coffee_production_2017, na.rm = TRUE)
+max(coffee_data$coffee_production_2016, na.rm = TRUE)
+max(coffee_data$coffee_production_2017, na.rm = TRUE)
+```
+
+If we want to look at total coffee production over the two year period, it's easy to mesh the 2016 and 2017 columns.
+
+```{r}
+world_coffee$total_coffee_production <- world_coffee$coffee_production_2016 + world_coffee$coffee_production_2017
+```
+
+Let's say we decide to make an object for major producers, where total coffee production exceeds 700,000 bags for the two-yea rperiod:
+
+```{r}
+major_producers2 = world_coffee[world_coffee$total_coffee_production > 700, na.rm=TRUE]
+```
+
+We can also just work with South America, by filtering out those producers (and changing the name to SA_coffee_production as I did here, because it's more accurate, since there are lots of countries in the database taht don't produce coffee):
+
+```{r}
+southamerica = world_coffee %>% filter(continent == "South America")
+southamerica_coffee_producers = world_coffee[southamerica, ]
+SA_coffee_production <- southamerica_coffee_producers
+```
+
+Finally, we're going to make a histogram of South American coffee production. To spice it up, we'll make the borders dark green, the columns pale green, and we'll give it breaks of 1000 on the x axis.
+
+```{r}
+hist(SA_coffee_production$total_coffee_production,
+    main="Histogram of 2016 and 2017 Coffee Production in South American Countries",
+    xlab="Coffee Production (in thousands of 60 kg bags)",
+    border="darkgreen",
+    col="palegreen",
+    breaks=seq(0,8000,by=1000)
+)
+```
