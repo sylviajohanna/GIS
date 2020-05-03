@@ -1,0 +1,56 @@
+---
+title: "Using RTweet to Map Twitter Conversations"
+author: "Sylvia de Boer"
+output:
+  html_document:
+    theme: journal
+    toc: true
+    toc_float: true
+---
+
+Installing required packages and libraries
+First we will install packages rtweet and github.
+```r
+install.packages("rtweet")
+install.packages("githubinstall")
+githubinstall::gh_install_packages("rtweet",  ref = "5ef897e",dependencies=TRUE, ask= FALSE)
+1
+library("rtweet")
+```
+
+### Connecting R to Twitter
+Next, we create a developer profile through Twitter, start a new app, and get a key, so we can link R to Twitter. 
+```r
+my_tokens <- create_token (app = "UChicago_Lab",
+                           consumer_key = "ldvwVWOFLJjVj8LCEaZUHlL0J",
+                           consumer_secret = "vtFkOlmNBrDpcixuSQjvZPRMbF7mnQ9Qno4ChQk3M6pStW8jw5")
+```
+Next we'll save the tokens in a file so we can retrieve it later.
+```r
+save(my_tokens, file = "./my_tokens_env")
+load("./my_tokens_env")
+```
+
+### Building a Query
+We're going to build a query to pull 18000 tweets (that being the limit) that contain the phrase "Tara Reade". This query excludes retweets.
+```r
+Tara_Reade_Tweets <- search_tweets("Tara Reade", n = 18000, include_rts = FALSE)
+```
+Here, we geocode the Tweets, thanks to a Google API key that we've also obtained recently through a generous free trial:
+```r
+Reade_Twitter <- search_tweets("Tara Reade", n = 18,000, geocode = lookup_coords("usa"), type = "recent", retryonratelimit = TRUE)
+```
+
+### Mapping Our Results
+We're going to locate the latitude and longitude and map them onto a map of the U.S. with state lines.
+```{r, results='markup'}
+Reade_Twitter <- lat_lng(Reade_Twitter)
+par(mar = c(0, 0, 0, 0))
+maps::map("state", lwd = .25)
+with(Reade_Twitter, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+```
+Finally, we'll put in our title and source.
+```r
+title("Tweets mentioning 'Tara Reade' in the United States", line = 1)
+title("Source: Twitter", line = -9)
+```
